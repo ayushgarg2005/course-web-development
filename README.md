@@ -1,139 +1,287 @@
-# 📚 CourseHub — Full-Stack Course Selling Platform
+# 📚 Course Selling Web Application — Full-Stack MERN Platform
 
 [![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org)
-[![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com)
+[![Express](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com)
 [![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org)
 [![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)](https://mongodb.com)
-[![Tailwind CSS](https://img.shields.io/badge/TailwindCSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white)](https://jwt.io)
 [![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev)
-[![Zod](https://img.shields.io/badge/Zod-3068B7?style=for-the-badge)](https://zod.dev)
+[![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
+[![Zod](https://img.shields.io/badge/Zod-3E67B1?style=for-the-badge&logo=zod&logoColor=white)](https://zod.dev)
 
-> A **full-stack online course marketplace** (think Udemy-lite) built with the MERN stack — featuring dual JWT authentication with silent token refresh, rate limiting, NoSQL injection protection, Zod schema validation, debounced search with autocomplete, an AI-powered chatbot, and a complete course system with video management, cart, purchase flow, and reviews.
-
-🔗 **Repo:** [github.com/ayushgarg2005/course-web-development](https://github.com/ayushgarg2005/course-web-development)
-
----
-
-## ⚡ Key Highlights (For Recruiters)
-
-| Area | What Was Built |
-|---|---|
-| **Security** | Dual JWT (access + refresh tokens), bcrypt hashing, per-route rate limiting, NoSQL injection prevention |
-| **Validation** | Zod schemas for every input — signup, signin, course creation, video upload, ratings |
-| **Auth UX** | Silent token refresh via Axios interceptors — sessions never interrupt mid-use |
-| **Performance** | Custom `useDebounce` hook + `useMemo` / `useCallback` to optimize search and re-renders |
-| **Backend Design** | Clean route → middleware → model separation; named MongoDB connection with graceful SIGINT shutdown |
-| **AI Integration** | Floating chatbot widget proxied through Express to an ngrok-exposed AI service |
-| **Full Feature Set** | Cart (localStorage), purchase confirmation modal, purchased courses, reviews, profile, video library |
+> A **production-grade, full-stack course marketplace** built with the MERN stack. Features JWT refresh-token rotation, Axios interceptor-based silent token refresh, AI-powered chatbot integration, debounced search with suggestions, Zod schema validation, and multiple security layers including rate limiting and NoSQL injection prevention.
 
 ---
 
-## 🛠️ Tech Stack
+## 📌 Table of Contents
 
-| Layer | Technology |
+- [Overview](#-overview)
+- [Tech Stack](#-tech-stack)
+- [System Architecture](#-system-architecture)
+- [Authentication Flow](#-authentication-flow)
+- [Request Lifecycle](#-request-lifecycle)
+- [Features](#-features)
+- [Project Structure](#-project-structure)
+- [Getting Started](#-getting-started)
+- [API Reference](#-api-reference)
+- [Security Highlights](#-security-highlights)
+- [Key Implementation Details](#-key-implementation-details)
+- [Author](#-author)
+
+---
+
+## 🔍 Overview
+
+**AppStore** is a full-stack course-selling platform where users can browse courses, add them to a cart, make purchases, watch video content, leave ratings/reviews, and interact with an AI course assistant. The system implements production-grade security practices and is organized around a clean RESTful API.
+
+The backend is a standalone **Express.js REST API** backed by **MongoDB via Mongoose**. The frontend is a **React 18 SPA** built with Vite and styled with Tailwind CSS.
+
+---
+
+## 🛠 Tech Stack
+
+### Backend
+| Technology | Purpose |
 |---|---|
-| **Frontend** | React 18, Vite, Tailwind CSS, React Router v7, React Toastify, FontAwesome |
-| **State / Auth** | React Context API + custom `useAuth` hook |
-| **HTTP Client** | Axios with request + response interceptors |
-| **Backend** | Node.js, Express.js (ES Modules) |
-| **Database** | MongoDB + Mongoose (named connection via `createConnection`) |
-| **Auth** | JWT access token (15 min) + refresh token (7 days) + bcrypt |
-| **Validation** | Zod — server-side schema parsing for all inputs |
-| **Security** | express-rate-limit, express-mongo-sanitize |
-| **AI Chatbot** | Express proxy → external AI service via configurable ngrok URL |
+| **Node.js + Express.js** | REST API server, routing, middleware pipeline |
+| **MongoDB + Mongoose** | NoSQL database with ODM schema enforcement |
+| **JWT (jsonwebtoken)** | Access tokens (15 min) + Refresh tokens (7 days) |
+| **bcrypt** | Password hashing with salt rounds |
+| **Zod** | Request body schema validation |
+| **express-rate-limit** | Brute-force and DDoS protection |
+| **express-mongo-sanitize** | NoSQL injection prevention |
+| **axios** | HTTP client for AI chatbot proxy requests |
+| **dotenv** | Environment variable management |
+
+### Frontend
+| Technology | Purpose |
+|---|---|
+| **React 18** | Component-based UI with hooks |
+| **Vite** | Fast build tool & dev server |
+| **React Router v7** | Client-side routing with protected routes |
+| **Axios** | HTTP client with request/response interceptors |
+| **Tailwind CSS** | Utility-first CSS framework |
+| **React Toastify** | Toast notifications |
+| **FontAwesome** | Icon library |
+
+### AI / ML
+| Technology | Purpose |
+|---|---|
+| **Jupyter Notebook (Python)** | Chatbot model hosted as a Python backend |
+| **ngrok** | Tunnel to expose local Python chatbot API |
+
+---
+
+## 🗺 System Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        CLIENT (Browser)                         │
+│                                                                 │
+│  React 18 SPA (Vite)                                           │
+│  ┌──────────┐ ┌───────────┐ ┌──────────┐ ┌─────────────────┐  │
+│  │ Homepage │ │CourseDetail│ │ CartPage │ │ PurchasedCourses│  │
+│  └──────────┘ └───────────┘ └──────────┘ └─────────────────┘  │
+│  ┌──────────┐ ┌──────────┐  ┌──────────┐ ┌─────────────────┐  │
+│  │ Profile  │ │  Chatbot │  │CourseVids│ │  Signin/Signup  │  │
+│  └──────────┘ └──────────┘  └──────────┘ └─────────────────┘  │
+│                                                                 │
+│  AuthContext (useAuth hook + Axios interceptors)               │
+│  localStorage: accessToken, refreshToken, userId, username     │
+└──────────────────────┬──────────────────────────────────────────┘
+                       │ HTTP/REST (JSON)
+                       │ Authorization: Bearer <accessToken>
+                       ▼
+┌─────────────────────────────────────────────────────────────────┐
+│              EXPRESS.JS SERVER (Port 3000)                      │
+│                                                                 │
+│  Middleware Pipeline:                                           │
+│  [express.json()] → [cors()] → [mongoSanitize()] →            │
+│  [generalLimiter: 100 req/15min] → [Routes]                   │
+│                                                                 │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │                    Route Handlers                        │  │
+│  │                                                          │  │
+│  │  /signup  /signin  /refresh  /logout   ← authLimiter    │  │
+│  │  (10 req/15min per IP)                                   │  │
+│  │                                                          │  │
+│  │  /courses  /courses/:id  /courses/review                 │  │
+│  │  /course/:id/video(s)                                    │  │
+│  │                                                          │  │
+│  │  /purchase  /purchased-courses  /profile/:userId         │  │
+│  │                                                          │  │
+│  │  /chat  (proxies to Python AI backend via ngrok)         │  │
+│  └─────────────────┬────────────────────────────────────────┘  │
+│                    │ authenticate middleware (JWT verify)       │
+│                    │ validateCourse middleware (Zod parse)      │
+└────────────────────┼────────────────────────────────────────────┘
+                     │
+        ┌────────────┴───────────┐
+        │                        │
+        ▼                        ▼
+┌──────────────┐     ┌─────────────────────────┐
+│   MongoDB    │     │  Python Chatbot Backend  │
+│              │     │  (Jupyter Notebook)      │
+│  Collections:│     │  Exposed via ngrok       │
+│  ┌─────────┐ │     │  POST /api/chat          │
+│  │  Users  │ │     └─────────────────────────┘
+│  ├─────────┤ │
+│  │ Courses │ │
+│  └─────────┘ │
+└──────────────┘
+```
+
+---
+
+## 🔐 Authentication Flow
+
+```
+┌──────────────────────────────────────────────────────────────────────┐
+│                        AUTHENTICATION FLOW                           │
+└──────────────────────────────────────────────────────────────────────┘
+
+  SIGNUP / SIGNIN
+  ──────────────
+  Client                  Express (authLimiter: 10/15min)          MongoDB
+    │                              │                                   │
+    │── POST /signup ─────────────▶│                                   │
+    │                              │── Zod validate body               │
+    │                              │── bcrypt.hash(password, 10) ─────▶│
+    │                              │◀─ User.create() ──────────────────│
+    │                              │── jwt.sign(userId, secret, 15m)   │
+    │                              │── jwt.sign(userId, refresh, 7d)   │
+    │                              │── user.refreshToken = token ─────▶│ (save)
+    │◀── { accessToken, refreshToken, userId } ─────────────────────── │
+
+
+  PROTECTED REQUEST
+  ─────────────────
+  Client                  Express                                  MongoDB
+    │                        │                                        │
+    │── GET /purchased ──────▶│                                        │
+    │   Authorization:        │── authenticate middleware              │
+    │   Bearer <accessToken>  │── jwt.verify(token, secret)           │
+    │                        │── req.userId = decoded.userId          │
+    │                        │── Route handler ──────────────────────▶│
+    │◀── 200 { data } ────── │◀─────────────────────────────────────  │
+
+
+  TOKEN REFRESH (Axios Interceptor — Silent, Client-Side)
+  ───────────────────────────────────────────────────────
+  Client                              Express
+    │                                    │
+    │── Any API call ───────────────────▶│
+    │◀─ 401 { expired: true } ──────────│
+    │                                    │
+    │  [Axios response interceptor fires]│
+    │── POST /refresh { refreshToken } ─▶│
+    │                                    │── verify refreshToken
+    │                                    │── check DB token matches
+    │◀── { newAccessToken, newRefreshToken }
+    │                                    │
+    │  [Update localStorage]             │
+    │  [Retry original request] ────────▶│
+    │◀── 200 { data } ──────────────────│
+
+
+  LOGOUT
+  ──────
+  Client ── POST /logout (with accessToken) ──▶ Express
+                                                 │── user.refreshToken = null (DB)
+  Client ── clear localStorage ◀──────────────── │
+```
+
+---
+
+## 🔄 Request Lifecycle
+
+```mermaid
+flowchart TD
+    A([Client Request]) --> B[express.json\nParse body]
+    B --> C[cors\nAllow origins]
+    C --> D[mongoSanitize\nStrip $ and . operators]
+    D --> E[generalLimiter\n100 req / 15 min / IP]
+    E --> F{Route Match}
+
+    F --> G[Auth Routes\n/signup /signin /refresh /logout]
+    F --> H[Course Routes\n/courses /course/:id/video]
+    F --> I[User Routes\n/purchase /purchased-courses /profile]
+    F --> J[Chat Route\n/chat → Python AI proxy]
+
+    G --> K[authLimiter\n10 req / 15 min / IP]
+    K --> L[Zod Schema Validation\nsignupSchema / signinSchema]
+    L --> M[bcrypt / JWT Logic]
+    M --> N[(MongoDB)]
+
+    H --> O{Auth Required?}
+    O -- Yes --> P[authenticate middleware\njwt.verify token]
+    O -- No --> Q[Route Handler]
+    P --> R{Token Valid?}
+    R -- No --> S[401 / 403 Error]
+    R -- Yes --> Q
+    Q --> T[validateCourse middleware\nZod courseSchema]
+    T --> N
+
+    I --> P
+    J --> U[axios.post to ngrok chatbot URL]
+    U --> V[Python LLM Backend]
+    V --> W[Response JSON]
+
+    N --> X[JSON Response]
+    W --> X
+    X --> Y([Client])
+```
 
 ---
 
 ## ✨ Features
 
-### 🔐 Authentication & Security
-- **Dual-token JWT**: Short-lived access tokens (15 min) paired with long-lived refresh tokens (7 days), stored per user in MongoDB
-- **Silent auto-refresh**: Axios response interceptor detects `401 + expired: true`, calls `/refresh`, stores the new token pair, and retries the original request — completely invisible to the user
-- **Secure logout**: Clears the refresh token in the database on logout, making old tokens unusable
-- **bcrypt** password hashing
-- **Zod validation** on every route input — malformed data is rejected before touching the database
-- **Rate limiting**: Auth routes capped at 10 requests / 15 min (brute-force prevention); all other routes capped at 100 requests / 15 min
-- **express-mongo-sanitize**: Strips `$` and `.` from all incoming request data, blocking NoSQL injection attacks like `{ "email": { "$gt": "" } }`
+### 🔐 Authentication & Session Management
+- JWT **access token** (15-minute expiry) + **refresh token** (7-day expiry)
+- **Refresh token rotation** — new token pair issued on every refresh
+- **Axios interceptors** — expired access tokens are silently refreshed and the original request is retried, completely transparent to the user
+- **Rate limiting** on auth routes: 10 requests per IP per 15 minutes (brute-force protection)
+- Passwords hashed with **bcrypt** (salt rounds: 10)
 
-### 🎓 Course Platform
-- Browse all courses on a responsive homepage grid with skeleton loading cards
-- Debounced search bar (300 ms) with live autocomplete suggestions (deduped by topic, max 5 shown)
-- Detailed course pages — description, discounted vs. actual price, "What You'll Learn" checklist, paginated reviews
-- Full video library per course (title, URL, thumbnail, duration in `hh:mm:ss`, downloadable resources)
-- Rating and review system — submit or update your review; star rating computed and displayed per course
-- Cart stored in `localStorage` (keyed by `userId`) with add/remove and a purchase confirmation modal
-- Purchased courses page — fetches all courses a user has bought from the backend
-- User profile showing account details and purchased course list
+### 🛍 Course Discovery
+- Browse all courses on the homepage
+- **Debounced search** (300ms delay) to filter courses by topic without hammering the API
+- **Search suggestions** — up to 5 unique topic suggestions rendered in real time using `useMemo`
 
-### 🤖 AI Chatbot
-- Floating collapsible widget rendered on every page via `App.jsx`
-- Express `/chat` route acts as a proxy, forwarding queries and context to an external AI service
-- AI service URL is environment-variable-driven (`NGROK_CHAT_URL`) for easy swap/deploy
-- Session-scoped message history maintained in React state
+### 📋 Course Detail Page
+- Full course metadata: description, price (discounted vs actual), ratings
+- **Learn points** grid with FontAwesome check icons
+- Reviews section with paginated "Show More / Show Less" functionality
+- Sidebar card with Buy Now & Add to Cart buttons
 
-### 📹 Video Management
-- Full CRUD API for videos within any course: add, list all, fetch by index, update, delete
+### 🛒 Cart System
+- **localStorage-based cart** keyed by `userId` — works without a cart API
+- Add / Remove courses from the cart
+- Confirm-purchase modal with backend call to persist to DB
 
----
+### 🎬 Video Player (Purchased Users Only)
+- Sidebar listing all course videos by title
+- HTML5 `<video>` player with `ref`-based reload on video switch
+- Protected route — redirects unauthenticated users
 
-## 🗺️ System Architecture
+### ⭐ Ratings & Reviews
+- Submit / update a rating (0–5) and comment for any purchased course
+- Form validation with inline error messages before API call
+- Optimistic UI update via `setCourse` on success
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│              REACT FRONTEND  (Vite + Tailwind CSS)          │
-│                                                             │
-│  AuthProvider (Context)                                     │
-│    ├─ Axios request interceptor  → attach Bearer token      │
-│    └─ Axios response interceptor → silent refresh on 401    │
-│                                                             │
-│  Routes (React Router v7):                                  │
-│    /                    → Homepage (search + course grid)   │
-│    /signup  /signin     → Auth forms (redirect if authed)   │
-│    /course-detail/:id   → Course info + reviews + sidebar   │
-│    /courses/:id/videos  → Video player (protected)          │
-│    /cart                → Cart page (protected)             │
-│    /purchased-courses   → My courses (protected)            │
-│    /profile             → User profile (protected)          │
-│                                                             │
-│  Custom Hooks: useAuth · useDebounce                        │
-└──────────────────────────┬──────────────────────────────────┘
-                           │ HTTP REST API
-                           ▼
-┌─────────────────────────────────────────────────────────────┐
-│             EXPRESS SERVER  (Node.js / ES Modules)          │
-│                                                             │
-│  Global middleware:                                         │
-│    express.json → cors → mongoSanitize → generalLimiter     │
-│                                                             │
-│  Routes:                                                    │
-│    auth.routes.js    → /signup /signin /refresh /logout     │
-│    course.routes.js  → /courses + /course/:id/video(s)      │
-│    user.routes.js    → /profile /purchase /purchased-courses│
-│    chat.routes.js    → /chat (AI proxy)                     │
-│                                                             │
-│  Middleware:                                                │
-│    authenticate.js   → JWT verification, sets req.userId    │
-│    validateCourse.js → Zod parse on course creation         │
-└──────────────────────────┬──────────────────────────────────┘
-                           │ Mongoose ODM
-                           ▼
-┌─────────────────────────────────────────────────────────────┐
-│              MONGODB  (Named createConnection)              │
-│                                                             │
-│   Users    ─  name · email · hashedPassword                 │
-│               purchasedCourses[] · refreshToken             │
-│                                                             │
-│   Courses  ─  topic · description · actualPrice            │
-│               discountedPrice · videos[] · ratings[]        │
-│               learnPoints[] · images[] · purchasedBy[]      │
-└─────────────────────────────────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────────┐
-│         EXTERNAL AI SERVICE  (ngrok tunnel)                 │
-│         Chatbot notebook: Backend/chatbot.ipynb             │
-└─────────────────────────────────────────────────────────────┘
-```
+### 🤖 AI Course Chatbot
+- Floating chatbot panel (toggleable) rendered globally across all routes
+- Proxied through the Express backend (`POST /chat`) to a **Python LLM backend** (Jupyter Notebook) exposed via **ngrok**
+- Markdown-like formatting: bold, bullet points, newlines rendered via `dangerouslySetInnerHTML`
+
+### 👤 Profile Page
+- Displays user name, email, and list of purchased courses
+- Click a course to navigate to its detail page
+
+### 💀 UX / Loading States
+- **Skeleton cards** during purchased-courses fetch
+- Toast notifications for all user actions (success, error, info) via React Toastify
+- Disabled submit buttons with "Please wait..." text while requests are in flight
 
 ---
 
@@ -142,206 +290,331 @@
 ```
 resume-project/
 │
-├── Backend/
+├── Backend/                          # Node.js + Express API
 │   ├── config/
-│   │   └── config.js               # Exports all env vars (JWT_SECRET, MONGO_URI, etc.)
+│   │   └── config.js                 # dotenv exports (JWT_SECRET, MONGO_URI, etc.)
 │   ├── middleware/
-│   │   ├── authenticate.js         # Verifies JWT, attaches decoded userId to req
-│   │   ├── ratelimiter.js          # authLimiter (10/15m) + generalLimiter (100/15m)
-│   │   └── validateCourse.js       # Zod middleware — parses course creation body
+│   │   ├── authenticate.js           # JWT verify middleware → req.userId
+│   │   ├── ratelimiter.js            # authLimiter (10/15min) + generalLimiter (100/15min)
+│   │   └── validateCourse.js         # Zod courseSchema middleware
 │   ├── models/
-│   │   ├── User.js                 # Schema: name, email, password, purchasedCourses[], refreshToken
-│   │   └── Course.js               # Schema: topic, prices, videos[], ratings[], learnPoints[], images[]
+│   │   ├── User.js                   # Mongoose schema: name, email, password, purchasedCourses, refreshToken
+│   │   └── Course.js                 # Mongoose schema: id, topic, description, prices, videos[], ratings[], images[], learnPoints[]
 │   ├── routes/
-│   │   ├── auth.routes.js          # Signup, signin, refresh, logout
-│   │   ├── course.routes.js        # Course CRUD, video CRUD, reviews, feedback
-│   │   ├── user.routes.js          # Profile, purchase, purchased-courses
-│   │   └── chat.routes.js          # AI chatbot proxy
+│   │   ├── auth.routes.js            # POST /signup /signin /refresh /logout
+│   │   ├── course.routes.js          # GET/POST /courses, review, video CRUD
+│   │   ├── user.routes.js            # GET /profile/:id, POST /purchase, GET /purchased-courses
+│   │   └── chat.routes.js            # POST /chat (proxy to Python AI)
 │   ├── schemas/
-│   │   └── zodSchemas.js           # signupSchema, signinSchema, courseSchema, videoSchema, ratingSchema
-│   ├── database.js                 # Named mongoose.createConnection + SIGINT graceful shutdown
-│   ├── index.js                    # App bootstrap — middleware stack + route mounting
-│   └── chatbot.ipynb               # Jupyter Notebook — AI chatbot prototype/experiments
+│   │   └── zodschemas.js             # signupSchema, signinSchema, courseSchema, videoSchema, ratingSchema
+│   ├── database.js                   # Named Mongoose connection with SIGINT graceful shutdown
+│   ├── index.js                      # App entry: middleware pipeline + route mounting
+│   ├── chatbot.ipynb                 # Jupyter Notebook: Python AI chatbot backend
+│   └── package.json
 │
-└── frontend/frontend-project/
-    ├── src/
-    │   ├── components/
-    │   │   ├── useAuth.jsx          # AuthContext: token storage, interceptors, refresh, logout
-    │   │   ├── useDebounce.jsx      # Generic debounce hook using setTimeout/clearTimeout
-    │   │   ├── Homepage.jsx         # Course listing + debounced search + memoized filtering
-    │   │   ├── Searchbar.jsx        # Controlled input with dropdown suggestions
-    │   │   ├── Courselist.jsx       # Responsive course grid with skeleton loading
-    │   │   ├── CardComponent.jsx    # Course card — add-to-cart + navigate to detail
-    │   │   ├── SkeletonCard.jsx     # Animated loading placeholder card
-    │   │   ├── CourseDetailPage.jsx # Full course page: info, learn-points, reviews, sidebar
-    │   │   ├── CourseDetails.jsx    # Video player page for purchased courses
-    │   │   ├── CourseVideosPage.jsx # Video list for a purchased course
-    │   │   ├── CartPage.jsx         # Cart from localStorage + purchase confirmation modal
-    │   │   ├── PurchasedCourses.jsx # Fetches and displays user's purchased courses
-    │   │   ├── Profile.jsx          # User profile + purchased course list
-    │   │   ├── SignupForm.jsx        # Signup → POST /signup
-    │   │   ├── SigninForm.jsx        # Signin → POST /signin
-    │   │   ├── Navbar.jsx           # Responsive navbar (desktop + mobile)
-    │   │   ├── DesktopNav.jsx       # Desktop navigation links
-    │   │   ├── MobileNav.jsx        # Hamburger menu for mobile
-    │   │   ├── Chatbot.jsx          # Floating AI chatbot widget (collapsible)
-    │   │   ├── ChatMessage.jsx      # Individual chat bubble
-    │   │   └── Renderstars.jsx      # Utility — computes average + star display from ratings[]
-    │   ├── App.jsx                  # Route tree + AuthProvider + protected route guards
-    │   └── main.jsx                 # React DOM entry point
-    ├── index.html
-    ├── vite.config.js
-    └── tailwind.config.js
+├── frontend/
+│   └── frontend-project/             # React 18 SPA (Vite)
+│       ├── src/
+│       │   ├── App.jsx               # Router setup, protected routes, AuthProvider wrapper
+│       │   ├── main.jsx              # React DOM root
+│       │   └── components/
+│       │       ├── useAuth.jsx       # AuthContext: token storage, Axios interceptors, login/logout
+│       │       ├── useDebounce.jsx   # Custom hook: debounce with configurable delay
+│       │       ├── Navbar.jsx        # Responsive navbar (desktop + mobile)
+│       │       ├── DesktopNav.jsx    # Desktop nav links
+│       │       ├── MobileNav.jsx     # Hamburger menu nav
+│       │       ├── Homepage.jsx      # Course listing with search + debounce
+│       │       ├── Searchbar.jsx     # Controlled search input with dropdown suggestions
+│       │       ├── Courselist.jsx    # Grid renderer for course cards
+│       │       ├── CardComponent.jsx # Individual course card with Buy Now / Add to Cart
+│       │       ├── CourseDetailPage.jsx  # Public course detail: description, learn points, reviews
+│       │       ├── CourseDetails.jsx     # Authenticated video player page with review form
+│       │       ├── CourseVideosPage.jsx  # Video index page
+│       │       ├── CartPage.jsx      # localStorage cart management
+│       │       ├── PurchasedCourses.jsx  # Authenticated list of owned courses with skeleton loader
+│       │       ├── Profile.jsx       # User profile + purchased courses summary
+│       │       ├── SigninForm.jsx     # Login form with rate-limit error handling
+│       │       ├── SignupForm.jsx     # Registration form
+│       │       ├── Chatbot.jsx       # Floating AI chat panel
+│       │       ├── ChatMessage.jsx   # Chat message renderer with markdown-like formatting
+│       │       ├── SkeletonCard.jsx  # Loading placeholder card
+│       │       └── Renderstars.jsx   # Star rating renderer with average calculation
+│       ├── index.html
+│       ├── vite.config.js
+│       ├── tailwind.config.js
+│       └── package.json
+│
+├── .gitignore
+└── README.md
 ```
-
----
-
-## 📡 API Reference
-
-### Auth — rate-limited to 10 req / 15 min per IP
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| `POST` | `/signup` | Register user; returns access + refresh tokens | ❌ |
-| `POST` | `/signin` | Login; returns access + refresh tokens | ❌ |
-| `POST` | `/refresh` | Exchange refresh token for a new token pair | ❌ |
-| `POST` | `/logout` | Nullify refresh token in DB | ✅ JWT |
-
-### Courses
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| `GET` | `/courses` | Fetch all courses | ❌ |
-| `GET` | `/courses/:id` | Fetch single course | ❌ |
-| `POST` | `/courses` | Create course (Zod validated) | ❌ |
-| `POST` | `/courses/review` | Submit or update a review | ✅ JWT |
-| `GET` | `/courses/:courseId/feedback` | Fetch all reviews | ❌ |
-
-### Video Management
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/course/:id/video` | Add video to a course |
-| `GET` | `/course/:id/videos` | Get all videos for a course |
-| `GET` | `/course/:id/video/:videoIndex` | Get single video |
-| `PUT` | `/courses/:id/video/:videoIndex` | Update a video |
-| `DELETE` | `/course/:id/video/:videoIndex` | Delete a video |
-
-### User
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| `GET` | `/profile/:userId` | Fetch user info + purchased courses | ❌ |
-| `POST` | `/purchase` | Purchase a course | ✅ JWT |
-| `GET` | `/purchased-courses` | List all courses purchased by user | ✅ JWT |
-
-### Chatbot
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/chat` | Proxy `{ query, context }` to AI service |
 
 ---
 
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js v18+
-- MongoDB (local or [Atlas](https://cloud.mongodb.com))
-- Python 3 + Jupyter (for `chatbot.ipynb`)
+- **Node.js** v16+
+- **MongoDB** (local: `mongodb://127.0.0.1:27017` or MongoDB Atlas)
+- **Python 3** + Jupyter (for the chatbot backend)
+- **ngrok** (to expose the Python chatbot, optional)
 
-### 1. Clone the repo
-```bash
-git clone https://github.com/ayushgarg2005/course-web-development.git
-cd course-web-development
-```
+---
 
-### 2. Backend setup
+### 1. Backend Setup
+
 ```bash
+# Navigate to Backend directory
 cd Backend
+
+# Install dependencies
 npm install
 
-# Create .env
+# Create your .env file
 cat > .env << EOF
-MONGO_URI=mongodb://localhost:27017/coursehub
-JWT_SECRET=your_access_token_secret
-JWT_REFRESH_SECRET=your_refresh_token_secret
 PORT=3000
-NGROK_CHAT_URL=https://your-ngrok-url    # optional — only needed for chatbot
+MONGO_URI=mongodb://127.0.0.1:27017/your_db_name
+JWT_SECRET=your_super_secret_access_key_here
+JWT_REFRESH_SECRET=your_different_refresh_secret_here
+NGROK_CHAT_URL=https://your-ngrok-url.ngrok-free.app
 EOF
 
+# Start the server (ES Modules — requires Node 16+)
 node index.js
-# ✅ Server running on http://localhost:3000
-# ✅ MongoDB connected successfully
 ```
 
-### 3. Frontend setup
+The server starts on `http://localhost:3000`.
+
+> **Note:** `JWT_SECRET` and `JWT_REFRESH_SECRET` must be different strings for security.
+
+---
+
+### 2. Frontend Setup
+
 ```bash
+# Navigate to frontend
 cd frontend/frontend-project
+
+# Install dependencies
 npm install
+
+# Build Tailwind CSS (run in a separate terminal)
+npm run build:css
+
+# Start the Vite dev server
 npm run dev
-# ✅ App running on http://localhost:5173
 ```
 
-### 4. Tailwind CSS (only if editing styles)
+The frontend starts on `http://localhost:5173`.
+
+> **Axios base URL** is set to `http://localhost:3000` inside `useAuth.jsx`. Ensure the backend is running before starting the frontend.
+
+---
+
+### 3. Chatbot Setup (Optional)
+
 ```bash
-npm run build:css   # watches input.css → output.css
+# Navigate to Backend
+cd Backend
+
+# Start Jupyter and open chatbot.ipynb
+jupyter notebook chatbot.ipynb
+
+# Run all cells to start the Python chat API server
+# Then expose it with ngrok:
+ngrok http <chatbot_port>
+
+# Copy the ngrok HTTPS URL into your .env:
+NGROK_CHAT_URL=https://xxxx-xx-xx.ngrok-free.app
 ```
 
 ---
 
-## 🔒 Auth Flow — How It Works
+## 📡 API Reference
 
+### 🔐 Authentication Routes
+| Method | Endpoint | Body | Auth | Description |
+|--------|----------|------|:----:|-------------|
+| `POST` | `/signup` | `{ name, email, password }` | ❌ | Register a new user |
+| `POST` | `/signin` | `{ email, password }` | ❌ | Login, receive token pair |
+| `POST` | `/refresh` | `{ refreshToken }` | ❌ | Rotate token pair |
+| `POST` | `/logout` | — | ✅ | Invalidate refresh token in DB |
+
+> Auth routes are rate-limited: **10 requests per IP per 15 minutes**.
+
+---
+
+### 📚 Course Routes
+| Method | Endpoint | Body / Params | Auth | Description |
+|--------|----------|--------------|:----:|-------------|
+| `GET` | `/courses` | — | ❌ | List all courses |
+| `GET` | `/courses/:id` | — | ❌ | Get single course by ID |
+| `POST` | `/courses` | Course object (Zod validated) | ❌ | Create a new course |
+| `POST` | `/courses/review` | `{ id, rating, comment, userId }` | ✅ | Submit or update a review |
+| `GET` | `/courses/:courseId/feedback` | — | ❌ | Get all feedback for a course |
+
+---
+
+### 🎬 Video Routes
+| Method | Endpoint | Auth | Description |
+|--------|----------|:----:|-------------|
+| `POST` | `/course/:id/video` | ❌ | Add a video to a course |
+| `GET` | `/course/:id/videos` | ❌ | List all videos for a course |
+| `GET` | `/course/:id/video/:videoIndex` | ❌ | Get a specific video |
+| `PUT` | `/courses/:id/video/:videoIndex` | ❌ | Update a video |
+| `DELETE` | `/course/:id/video/:videoIndex` | ❌ | Delete a video |
+
+---
+
+### 👤 User Routes
+| Method | Endpoint | Body | Auth | Description |
+|--------|----------|------|:----:|-------------|
+| `GET` | `/profile/:userId` | — | ❌ | Get user profile + purchased courses |
+| `POST` | `/purchase` | `{ courseId }` | ✅ | Purchase a course |
+| `GET` | `/purchased-courses` | — | ✅ | List all purchased courses for logged-in user |
+
+---
+
+### 🤖 Chat Route
+| Method | Endpoint | Body | Auth | Description |
+|--------|----------|------|:----:|-------------|
+| `POST` | `/chat` | `{ query, context }` | ❌ | Proxy to Python AI chatbot |
+
+---
+
+## 🔒 Security Highlights
+
+| Layer | Implementation | Details |
+|---|---|---|
+| **Password Storage** | `bcrypt.hash(password, 10)` | Salt rounds ensure unique hashes |
+| **Access Tokens** | JWT signed with `JWT_SECRET` | 15-minute expiry |
+| **Refresh Tokens** | JWT signed with `JWT_REFRESH_SECRET` | 7-day expiry, stored in DB |
+| **Token Rotation** | New pair on every `/refresh` | Prevents replay attacks |
+| **Rate Limiting** | `express-rate-limit` | Auth: 10/15min; General: 100/15min |
+| **NoSQL Injection** | `express-mongo-sanitize` | Strips `$` and `.` from all request fields |
+| **Schema Validation** | `zod` | All inputs validated before DB touch |
+| **Auto Token Refresh** | Axios response interceptor | 401 + `expired: true` triggers silent refresh |
+| **CORS** | `cors()` middleware | Enabled for frontend communication |
+
+---
+
+## 🧠 Key Implementation Details
+
+These are the design decisions worth discussing in technical interviews:
+
+### 1. Dual-Token JWT Strategy
+The system uses **short-lived access tokens (15m)** alongside **long-lived refresh tokens (7d)**. The refresh token is stored in MongoDB, so it can be revoked server-side on logout. On `/refresh`, both tokens are rotated — the old refresh token is replaced in the DB, preventing reuse.
+
+### 2. Silent Token Refresh via Axios Interceptors
+`useAuth.jsx` registers an Axios **response interceptor** that catches any `401` response with `expired: true`. It then automatically calls `/refresh`, updates `localStorage`, and **retries the original failed request** — all transparently, without user action.
+
+```js
+// Simplified from useAuth.jsx
+axios.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response?.status === 401 && error.response?.data?.expired) {
+      const { data } = await axios.post('/refresh', { refreshToken });
+      localStorage.setItem('accessToken', data.accessToken);
+      error.config.headers.Authorization = `Bearer ${data.accessToken}`;
+      return axios(error.config); // retry original request
+    }
+    return Promise.reject(error);
+  }
+);
 ```
-REGISTER / LOGIN
-  └─► Server creates:
-        accessToken  = JWT signed with JWT_SECRET        (expires: 15m)
-        refreshToken = JWT signed with JWT_REFRESH_SECRET (expires: 7d)
-      refreshToken is saved to user document in MongoDB
 
-FRONTEND (useAuth.jsx)
-  └─► Both tokens stored in localStorage
-  └─► Axios request interceptor → auto-attaches:
-        Authorization: Bearer <accessToken>
+### 3. Performance Optimizations on Homepage
+- `useDebounce(searchQuery, 300)` — delays filtering until the user stops typing, reducing re-renders
+- `useMemo` for `filteredCourses` and `suggestions` — avoids recomputing on unrelated state changes
+- `useCallback` wrapping `fetchCourses` — stable function reference for `useEffect` dependency
 
-WHEN ACCESS TOKEN EXPIRES
-  └─► Server responds: { status: 401, expired: true }
-  └─► Axios response interceptor catches this
-  └─► Calls POST /refresh with stored refreshToken
-  └─► Server validates refresh token against DB copy
-  └─► Issues a new token pair → saved to localStorage
-  └─► Original request retried automatically
+### 4. Zod Schema Validation
+All incoming data is validated with Zod **before** it touches the database:
+- `signupSchema` / `signinSchema` for auth
+- `courseSchema` (nested: `videoSchema[]`, `ratingSchema[]`) for course creation
+- The `validateCourse` middleware parses and replaces `req.body` with the typed, validated result
 
-LOGOUT
-  └─► POST /logout → server sets user.refreshToken = null in MongoDB
-  └─► localStorage cleared → redirect to /signin
+### 5. Named Mongoose Connection
+`database.js` uses `mongoose.createConnection()` instead of `mongoose.connect()`. This creates a **named connection** exported as `dbConnection`, giving explicit control over connection lifecycle and enabling graceful shutdown on `SIGINT`.
+
+### 6. Client-Side Cart with localStorage
+Cart state is stored in `localStorage` keyed by `userId` — allowing multiple users on the same machine to have separate carts without a cart API. The purchase API is only called when confirming checkout.
+
+### 7. AI Chatbot Architecture
+The chatbot is a two-service system: the Express backend proxies POST requests to a Python backend (Jupyter Notebook serving an API), exposed via ngrok. This decouples the ML logic from the Node.js server and allows swapping the AI backend independently.
+
+---
+
+## 🗂 MongoDB Schema Design
+
+### User Collection
+```
+{
+  name:             String (required)
+  email:            String (required, unique)
+  password:         String (bcrypt hash)
+  purchasedCourses: [String]     ← array of course IDs
+  refreshToken:     String | null
+}
+```
+
+### Course Collection
+```
+{
+  id:              String (unique)
+  topic:           String
+  description:     String
+  actualPrice:     Number (min: 0)
+  discountedPrice: Number (min: 0)
+  images:          [String]
+  learnPoints:     [String]
+  purchasedBy:     [ObjectId → User]
+  ratings: [{
+    userId:   ObjectId → User
+    username: String
+    rating:   Number (0–5)
+    comment:  String
+  }]
+  videos: [{
+    title:      String
+    url:        String
+    thumbnail:  String
+    duration:   String  ← hh:mm:ss format
+    videoIndex: Number
+    resources:  [String]
+    createdAt:  Date
+    updatedAt:  Date
+  }]
+}
 ```
 
 ---
 
-## 🧰 Technical Decisions Worth Discussing in Interviews
+## 🌐 Frontend Routing
 
-**Why dual JWT (access + refresh tokens)?**  
-Short-lived access tokens minimize exposure if a token is leaked — the attack window is only 15 minutes. Refresh tokens allow the session to persist without requiring re-login while being revocable server-side (by deleting the stored token).
+| Path | Component | Auth Required |
+|------|-----------|:---:|
+| `/` | `Homepage` | ❌ |
+| `/signup` | `SignupForm` | ❌ (redirects if logged in) |
+| `/signin` | `SigninForm` | ❌ (redirects if logged in) |
+| `/course-detail/:courseId` | `CourseDetailPage` | ❌ |
+| `/courses/:courseId/videos` | `CourseDetails` | ✅ |
+| `/purchased-courses` | `PurchasedCourses` | ✅ |
+| `/cart` | `CartPage` | ✅ |
+| `/profile` | `Profile` | ✅ |
 
-**Why Zod for validation?**  
-Zod schemas act as a single source of truth for both runtime validation and structural contracts. Error messages are clear and structured, making client-side handling straightforward. The `courseSchema` and `videoSchema` (with regex for `hh:mm:ss` duration format) show how validation scales beyond basic field checks.
-
-**Why `mongoose.createConnection()` over `mongoose.connect()`?**  
-Named connections make the database handle explicit in every model file (`dbConnection.model(...)`) instead of relying on Mongoose's global default. This is more maintainable, easier to test, and supports multi-database setups.
-
-**Why `useDebounce` + `useMemo` for search?**  
-Without debouncing, the filter function runs on every single keystroke. The custom `useDebounce` hook delays the search by 300 ms so filtering only happens after the user pauses typing. `useMemo` additionally ensures the filter result is only recomputed when either the query or the course list actually changes — not on every render.
-
-**Why localStorage for the cart (keyed by userId)?**  
-Cart state doesn't require a backend endpoint — it's stored locally per user, so each user's cart is isolated without any round-trip to the server. The tradeoff is that carts don't persist across devices, which is an acceptable limitation for this scope.
+> `<Chatbot />` is rendered globally outside the route tree — visible on all pages.
 
 ---
 
 ## 👨‍💻 Author
 
-**Ayush Garg**  
-B.Tech — Big Data & Cloud Computing, NSUT (Netaji Subhas University of Technology)
-
-[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/ayushgarg2005)
+**Ayush Garg**
+- GitHub: [@ayushgarg2005](https://github.com/ayushgarg2005)
+- University: Netaji Subhas University of Technology, B.Tech CS & DS (2023–Present)
 
 ---
 
 ## 📄 License
 
-MIT — open source and free to use.
+This project is open source and available under the [MIT License](LICENSE).
