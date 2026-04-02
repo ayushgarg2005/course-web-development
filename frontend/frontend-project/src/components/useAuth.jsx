@@ -1,26 +1,74 @@
+import { createContext, useContext, useState } from 'react';
+import axios from 'axios';
 
-import { createContext, useContext, useEffect, useState } from "react";
+axios.defaults.baseURL = 'http://localhost:3000';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem("authToken"));
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    !!localStorage.getItem('accessToken')
+  );
 
-  useEffect(() => {
-    const token = localStorage.getItem("authToken");
-    setIsAuthenticated(!!token);
-  }, []);
+  // Attach accessToken to every request automatically
+  axios.interceptors.request.use((config) => {
+    const token = localStorage.getItem('accessToken');
+    if (token) config.headers.Authorization = `Bearer ${token}`;
+    return config;
+  });
 
-  const handleAuthSuccess = (token) => {
-    localStorage.setItem("authToken", token);
+  // Auto-refresh when server returns 401 + expired: true
+  axios.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+      const original = error.config;
+      const isExpired =
+        error.response?.status === 401 && error.response?.data?.expired === true;
+
+      if (isExpired && !original._retry) {
+        original._retry = true;
+        try {
+          const refreshToken = localStorage.getItem('refreshToken');
+          if (!refreshToken) throw new Error('No refresh token');
+
+          const { data } = await axios.post('/refresh', { refreshToken });
+
+          localStorage.setItem('accessToken', data.accessToken);
+          localStorage.setItem('refreshToken', data.refreshToken);
+
+          original.headers.Authorization = `Bearer ${data.accessToken}`;
+          return axios(original);
+        } catch {
+          localStorage.clear();
+          setIsAuthenticated(false);
+          window.location.href = '/signin';
+        }
+      }
+
+      return Promise.reject(error);
+    }
+  );
+
+  const handleAuthSuccess = ({ accessToken, refreshToken, userId, name }) => {
+    localStorage.setItem('accessToken',  accessToken);
+    localStorage.setItem('refreshToken', refreshToken);
+    localStorage.setItem('userId',       userId);
+    if (name) localStorage.setItem('username', name);
     setIsAuthenticated(true);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("userId");
-    localStorage.removeItem("username");
-    setIsAuthenticated(false);
+  const handleLogout = async () => {
+    try {
+      await axios.post('/logout');
+    } catch {
+      // Continue logout even if request fails
+    } finally {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('username');
+      setIsAuthenticated(false);
+    }
   };
 
   return (

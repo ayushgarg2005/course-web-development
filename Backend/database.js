@@ -1,8 +1,31 @@
 import mongoose from 'mongoose';
+import { MONGO_URI } from './config/config.js';
 
+if (!MONGO_URI) {
+  throw new Error('MONGO_URI is not defined in your .env file');
+}
 
-// Single database connection
-const dbConnection = mongoose.createConnection('mongodb://127.0.0.1:27017/study7'); // Use signup2 or courses3
+// Named connection — used by models as dbConnection.model(...)
+const dbConnection = mongoose.createConnection(MONGO_URI);
+
+dbConnection.on('connected', () => {
+  console.log('MongoDB connected successfully');
+});
+
+dbConnection.on('error', (err) => {
+  console.error('MongoDB connection error:', err.message);
+  process.exit(1);
+});
+
+dbConnection.on('disconnected', () => {
+  console.warn('MongoDB disconnected');
+});
+
+// Graceful shutdown on app termination
+process.on('SIGINT', async () => {
+  await dbConnection.close();
+  console.log('MongoDB connection closed (app termination)');
+  process.exit(0);
+});
 
 export { dbConnection };
-// mongodb://127.0.0.1:27017/signup2
