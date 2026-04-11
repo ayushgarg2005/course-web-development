@@ -9,6 +9,7 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(
     !!localStorage.getItem('accessToken')
   );
+  const [userRole, setUserRole] = useState(localStorage.getItem('role') || null);
 
   // Attach accessToken to every request automatically
   axios.interceptors.request.use((config) => {
@@ -41,6 +42,7 @@ export const AuthProvider = ({ children }) => {
         } catch {
           localStorage.clear();
           setIsAuthenticated(false);
+          setUserRole(null);
           window.location.href = '/signin';
         }
       }
@@ -49,11 +51,15 @@ export const AuthProvider = ({ children }) => {
     }
   );
 
-  const handleAuthSuccess = ({ accessToken, refreshToken, userId, name }) => {
+  const handleAuthSuccess = ({ accessToken, refreshToken, userId, name, role }) => {
     localStorage.setItem('accessToken',  accessToken);
     localStorage.setItem('refreshToken', refreshToken);
     localStorage.setItem('userId',       userId);
     if (name) localStorage.setItem('username', name);
+    if (role) {
+      localStorage.setItem('role', role);
+      setUserRole(role);
+    }
     setIsAuthenticated(true);
   };
 
@@ -67,12 +73,14 @@ export const AuthProvider = ({ children }) => {
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('userId');
       localStorage.removeItem('username');
+      localStorage.removeItem('role');
       setIsAuthenticated(false);
+      setUserRole(null);
     }
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, handleAuthSuccess, handleLogout }}>
+    <AuthContext.Provider value={{ isAuthenticated, userRole, handleAuthSuccess, onLogout: handleLogout }}>
       {children}
     </AuthContext.Provider>
   );

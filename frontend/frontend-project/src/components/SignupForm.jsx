@@ -27,6 +27,8 @@ const SignupForm = () => {
         accessToken:  data.accessToken,
         refreshToken: data.refreshToken,
         userId:       data.userId,
+        name:         formData.name,
+        role:         data.role,
       });
 
       setMessage(data.message);

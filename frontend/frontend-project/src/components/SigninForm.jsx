@@ -28,6 +28,7 @@ const SigninForm = () => {
         refreshToken: data.refreshToken,
         userId:       data.userId,
         name:         data.name,
+        role:         data.role,
       });
 
       setMessage('Sign in successful!');

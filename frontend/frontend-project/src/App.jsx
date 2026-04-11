@@ -14,6 +14,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import CourseDetailPage from "./components/CourseDetailPage";
 import Chatbot from "./components/Chatbot";
+import AddCourse from "./components/AddCourse";
 function App() {
   return (
     <AuthProvider>
@@ -26,7 +27,7 @@ function App() {
 }
 
 function AppRoutes() {
-  const { isAuthenticated, handleAuthSuccess } = useAuth();
+  const { isAuthenticated, userRole, handleAuthSuccess } = useAuth();
 
   return (
     <>
@@ -39,6 +40,8 @@ function AppRoutes() {
       <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/" replace />} />
       <Route path="/courses/:courseId/videos" element={isAuthenticated ? <CourseDetails /> : <Navigate to="/" replace />} /> 
       <Route path="/course-detail/:courseId" element={<CourseDetailPage />} />
+      <Route path="/add-course" element={isAuthenticated && userRole === 'admin' ? <AddCourse /> : <Navigate to="/" replace />} />
+      <Route path="/edit-course/:courseId" element={isAuthenticated && userRole === 'admin' ? <AddCourse /> : <Navigate to="/" replace />} />
     </Routes>
       <Chatbot/>
     </>

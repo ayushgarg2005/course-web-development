@@ -29,7 +29,7 @@ const CartPage = () => {
 const confirmPurchase = async () => {
     if (!selectedCourse) return;
 
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem("accessToken");
     if (!token) {
         toast.error("You need to be logged in to purchase a course.");
         return;

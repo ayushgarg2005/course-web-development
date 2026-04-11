@@ -8,7 +8,12 @@ const router = express.Router();
 // GET /profile/:userId
 router.get('/profile/:userId', async (req, res) => {
   try {
-    const user = await User.findById(req.params.userId);
+    const { userId } = req.params;
+    if (!userId.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({ message: 'Invalid User ID format' });
+    }
+
+    const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: 'User not found' });
 
     const courses = await Course.find({ id: { $in: user.purchasedCourses } })

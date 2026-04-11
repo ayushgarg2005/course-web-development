@@ -2,13 +2,12 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
-import './output.css';
 import DesktopNav from './DesktopNav';
 import { MobileNav } from './MobileNav';
 import { useAuth } from './useAuth';
 
 export const Navbar = () => {
-  const { isAuthenticated, handleLogout } = useAuth();
+  const { isAuthenticated, userRole, onLogout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
   console.log("nav ", isAuthenticated);
@@ -21,7 +20,7 @@ export const Navbar = () => {
           <Link to="/">AppStore</Link>
         </div>
         {/* Desktop Navigation */}
-        <DesktopNav isAuthenticated={isAuthenticated} onLogout={handleLogout} />
+        <DesktopNav isAuthenticated={isAuthenticated} userRole={userRole} onLogout={onLogout} />
 
         {/* Hamburger Menu for Mobile */}
         <div className="lg:hidden">
@@ -36,7 +35,12 @@ export const Navbar = () => {
 
       {/* Mobile Navigation */}
       {isMenuOpen && (
-        <MobileNav isAuthenticated={isAuthenticated} onLogout={handleLogout} setIsMenuOpen={setIsMenuOpen} />
+        <MobileNav 
+          isAuthenticated={isAuthenticated} 
+          userRole={userRole} 
+          onLogout={onLogout} 
+          setIsMenuOpen={setIsMenuOpen} 
+        />
       )}
     </nav>
   );

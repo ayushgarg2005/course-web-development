@@ -9,9 +9,10 @@ import {
   faSignOutAlt,
   faUser,
   faShoppingCart,
+  faPlus,
 } from '@fortawesome/free-solid-svg-icons';
 
-export const MobileNav = ({ isAuthenticated, onLogout, setIsMenuOpen }) => {
+export const MobileNav = ({ isAuthenticated, userRole, onLogout, setIsMenuOpen }) => {
   const location = useLocation();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -40,6 +41,9 @@ export const MobileNav = ({ isAuthenticated, onLogout, setIsMenuOpen }) => {
         {isAuthenticated ? (
           <>
             <NavItem to="/purchased-courses" icon={faCartArrowDown} label="My Courses" isActive={isActive} setIsMenuOpen={setIsMenuOpen} />
+            {userRole === 'admin' && (
+              <NavItem to="/add-course" icon={faPlus} label="Add Course" isActive={isActive} setIsMenuOpen={setIsMenuOpen} />
+            )}
             <NavItem to="/cart" icon={faShoppingCart} label="Cart" isActive={isActive} setIsMenuOpen={setIsMenuOpen} />
             <NavItem to="/profile" icon={faUser} label="Profile" isActive={isActive} setIsMenuOpen={setIsMenuOpen} />
 

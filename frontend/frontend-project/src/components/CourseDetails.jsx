@@ -22,7 +22,7 @@ function CourseDetails() {
 
   useEffect(() => {
     const fetchCourseDetails = async () => {
-      const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem("accessToken");
       if (!token) {
         navigate("/signin");
         return;
@@ -71,7 +71,7 @@ function CourseDetails() {
     }
     if (hasValidationError) return;
 
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem("accessToken");
     if (!token) {
       setError("Authentication required. Please sign in.");
       return;

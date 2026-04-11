@@ -7,6 +7,7 @@ const userSchema = new mongoose.Schema({
   password:         { type: String, required: true },
   purchasedCourses: [{ type: String }],
   refreshToken:     { type: String, default: null },
+  role:             { type: String, enum: ['user', 'admin'], default: 'user' },
 });
 
 const User = dbConnection.model('User', userSchema);

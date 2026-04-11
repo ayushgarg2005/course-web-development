@@ -9,9 +9,10 @@ import {
   faSignOutAlt,
   faUser,
   faShoppingCart,
+  faPlus,
 } from "@fortawesome/free-solid-svg-icons";
 
-const DesktopNav = ({ isAuthenticated, onLogout }) => {
+const DesktopNav = ({ isAuthenticated, userRole, onLogout }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation(); // Get current path
@@ -36,6 +37,9 @@ const DesktopNav = ({ isAuthenticated, onLogout }) => {
       {isAuthenticated ? (
         <>
           <NavItem to="/purchased-courses" icon={faCartArrowDown} label="My Courses" location={location} />
+          {userRole === 'admin' && (
+            <NavItem to="/add-course" icon={faPlus} label="Add Course" location={location} />
+          )}
           <NavItem to="/cart" icon={faShoppingCart} label="Cart" location={location} />
           <NavItem to="/profile" icon={faUser} label="Profile" location={location} />
           <button

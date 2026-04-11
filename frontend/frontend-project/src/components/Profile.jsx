@@ -24,7 +24,7 @@ const Profile = () => {
     // Fetch user profile data using axios
     const fetchUserProfile = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/profile/${userId}`);
+        const response = await axios.get(`/profile/${userId}`);
         setUserData(response.data); // Set fetched data in the state
         setLoading(false);
       } catch (err) {
@@ -60,8 +60,9 @@ const Profile = () => {
           {/* Purchased Courses Section */}
           <div className="mt-12">
             <h2 className="text-3xl sm:text-4xl font-semibold text-blue-800 mb-8">Purchased Courses</h2>
-            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
-              {userData.purchasedCourses.map(course => (
+            {userData?.purchasedCourses?.length > 0 ? (
+              <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
+                {userData.purchasedCourses.map(course => (
                 <li
                   key={course.id}
                   onClick={() => goToCourseDetail(course.id)} // Redirect to course detail page
@@ -75,8 +76,11 @@ const Profile = () => {
                     </p>
                   </div>
                 </li>
-              ))}
-            </ul>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-xl text-gray-500">No courses purchased yet.</p>
+            )}
           </div>
         </div>
       </div>

@@ -13,6 +13,7 @@ const authenticate = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, JWT_SECRET_KEY);
     req.userId = decoded.userId;
+    req.userRole = decoded.role;
     next();
   } catch (error) {
     if (error.name === 'TokenExpiredError') {

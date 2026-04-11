@@ -20,7 +20,7 @@ const PurchasedCourses = () => {
 
   useEffect(() => {
     const fetchPurchasedCourses = async () => {
-      const token = localStorage.getItem("authToken");
+      const token = localStorage.getItem("accessToken");
       if (!token) {
         navigate("/signin");
         return;
@@ -36,7 +36,7 @@ const PurchasedCourses = () => {
       } catch (err) {
         setLoading(false); // Stop loading on error
         if (err.response?.status === 401) {
-          localStorage.removeItem("authToken");
+          localStorage.removeItem("accessToken");
           navigate("/signin");
         } else {
           setError(err.response?.data?.message || "An error occurred while fetching courses.");
