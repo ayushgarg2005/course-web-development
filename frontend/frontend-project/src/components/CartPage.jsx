@@ -77,13 +77,13 @@ const confirmPurchase = async () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {cartCourses.map((course) => {
-            const { stars, averageRating } = Renderstars(course.ratings.map(r => r.rating));
+            const { stars, averageRating } = Renderstars((course.ratings || []).map(r => r.rating));
             return (
               <div key={course.id} className="bg-white shadow-lg rounded-lg p-6">
                 <div
                   className="w-full h-48 bg-gray-300 rounded-lg mb-4"
                   style={{
-                    backgroundImage: `url(${course.images[0] || '/default-image.jpg'})`,
+                    backgroundImage: `url(${(course.images && course.images[0]) || '/default-image.jpg'})`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                   }}
@@ -141,8 +141,8 @@ const confirmPurchase = async () => {
           </div>
         </div>
       )}
-      
 
+      
     </div>
     </>
   );
