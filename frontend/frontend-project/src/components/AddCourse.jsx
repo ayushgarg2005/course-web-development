@@ -28,7 +28,7 @@ const AddCourse = () => {
     if (isEditMode) {
       const fetchCourseData = async () => {
         try {
-          const response = await axios.get(`/courses/${courseId}`);
+          const response = await axios.get(`https://course-web-development.onrender.com/courses/${courseId}`);
           setCourseData(response.data);
         } catch (error) {
           toast.error("Failed to load course data for editing");
@@ -120,10 +120,10 @@ const AddCourse = () => {
       };
       
       if (isEditMode) {
-        await axios.put(`/courses/${courseId}`, finalData);
+        await axios.put(`https://course-web-development.onrender.com/courses/${courseId}`, finalData);
         toast.success('Course updated successfully!');
       } else {
-        await axios.post('/courses', finalData);
+        await axios.post('https://course-web-development.onrender.com/courses', finalData);
         toast.success('Course published successfully!');
       }
       navigate('/');

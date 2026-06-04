@@ -18,7 +18,7 @@ const Chatbot = () => {
 
     try {
       // Replace with your backend URL
-      const response = await axios.post('/chat', {
+      const response = await axios.post('https://course-web-development.onrender.com/chat', {
         query: input,
         context: 'course' // Can be dynamic based on the user's needs
       });

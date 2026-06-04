@@ -23,7 +23,7 @@ const Homepage = () => {
   const fetchCourses = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await axios.get('/courses'); // Replace with backend URL
+      const response = await axios.get('https://course-web-development.onrender.com/courses'); // Replace with backend URL
       setCourses(response.data);
     } catch (error) {
       console.error('Error fetching courses:', error);

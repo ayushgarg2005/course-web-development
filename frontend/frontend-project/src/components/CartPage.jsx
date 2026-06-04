@@ -39,7 +39,7 @@ const confirmPurchase = async () => {
 
     try {
         const response = await axios.post(
-            '/purchase', // Replace with API URL
+            'https://course-web-development.onrender.com/purchase', // Replace with API URL
             { courseId: selectedCourse.id },
             {
                 headers: {

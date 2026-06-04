@@ -29,7 +29,7 @@ function CourseDetails() {
       }
 
       try {
-        const response = await axios.get(`/courses/${courseId}`, {
+        const response = await axios.get(`https://course-web-development.onrender.com/courses/${courseId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setCourse(response.data);
