@@ -39,7 +39,7 @@ const confirmPurchase = async () => {
 
     try {
         const response = await axios.post(
-            "http://localhost:3000/purchase", // Replace with API URL
+            '/purchase', // Replace with API URL
             { courseId: selectedCourse.id },
             {
                 headers: {
@@ -150,5 +150,4 @@ const confirmPurchase = async () => {
 
 export default CartPage;
 
-// // // http://localhost:3000/purchase
 

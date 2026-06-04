@@ -18,7 +18,7 @@ const Chatbot = () => {
 
     try {
       // Replace with your backend URL
-      const response = await axios.post('http://localhost:3000/chat', {
+      const response = await axios.post('/chat', {
         query: input,
         context: 'course' // Can be dynamic based on the user's needs
       });

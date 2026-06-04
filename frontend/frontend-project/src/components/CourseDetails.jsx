@@ -29,7 +29,7 @@ function CourseDetails() {
       }
 
       try {
-        const response = await axios.get(`http://localhost:3000/courses/${courseId}`, {
+        const response = await axios.get(`/courses/${courseId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setCourse(response.data);

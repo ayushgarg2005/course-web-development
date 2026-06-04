@@ -15,7 +15,7 @@ const CourseVideosPage = () => {
   useEffect(() => {
     const fetchVideos = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/courses/${courseId}/videos`);
+        const response = await axios.get(`/courses/${courseId}/videos`);
         setVideos(response.data.videos);
       } catch (err) {
         setError("Failed to load course videos.");

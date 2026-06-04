@@ -40,7 +40,7 @@ const CardComponent = ({ course, isAuthenticated }) => {
     setIsLoading(true);
     try {
       const response = await axios.post(
-        "http://localhost:3000/purchase",
+        '/purchase',
         { courseId: selectedCourse.id },
         {
           headers: {
