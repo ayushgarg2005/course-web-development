@@ -11,7 +11,7 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: "https://course-web-development.onrender.com",
+    origin: "https://course-web-development.vercel.app",
     credentials: true,
   })
 );
