@@ -18,43 +18,23 @@ export const AuthProvider = ({ children }) => {
     return config;
   });
 
-  // Auto-refresh when server returns 401 + expired: true
+  // Handle token expiration
   axios.interceptors.response.use(
     (response) => response,
-    async (error) => {
-      const original = error.config;
-      const isExpired =
-        error.response?.status === 401 && error.response?.data?.expired === true;
-
-      if (isExpired && !original._retry) {
-        original._retry = true;
-        try {
-          const refreshToken = localStorage.getItem('refreshToken');
-          if (!refreshToken) throw new Error('No refresh token');
-
-          const { data } = await axios.post('/refresh', { refreshToken });
-
-          localStorage.setItem('accessToken', data.accessToken);
-          localStorage.setItem('refreshToken', data.refreshToken);
-
-          original.headers.Authorization = `Bearer ${data.accessToken}`;
-          return axios(original);
-        } catch {
-          localStorage.clear();
-          setIsAuthenticated(false);
-          setUserRole(null);
-          window.location.href = '/signin';
-        }
+    (error) => {
+      if (error.response?.status === 401) {
+        localStorage.clear();
+        setIsAuthenticated(false);
+        setUserRole(null);
+        window.location.href = '/signin';
       }
-
       return Promise.reject(error);
     }
   );
 
-  const handleAuthSuccess = ({ accessToken, refreshToken, userId, name, role }) => {
-    localStorage.setItem('accessToken',  accessToken);
-    localStorage.setItem('refreshToken', refreshToken);
-    localStorage.setItem('userId',       userId);
+  const handleAuthSuccess = ({ accessToken, userId, name, role }) => {
+    localStorage.setItem('accessToken', accessToken);
+    localStorage.setItem('userId',      userId);
     if (name) localStorage.setItem('username', name);
     if (role) {
       localStorage.setItem('role', role);
@@ -70,7 +50,6 @@ export const AuthProvider = ({ children }) => {
       // Continue logout even if request fails
     } finally {
       localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
       localStorage.removeItem('userId');
       localStorage.removeItem('username');
       localStorage.removeItem('role');
