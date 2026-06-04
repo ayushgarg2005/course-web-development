@@ -1,7 +1,7 @@
 import { createContext, useContext, useState } from 'react';
 import axios from 'axios';
 
-axios.defaults.baseURL = 'http://localhost:3000';
+axios.defaults.baseURL = 'https://course-web-development.onrender.com';
 
 const AuthContext = createContext();
 
