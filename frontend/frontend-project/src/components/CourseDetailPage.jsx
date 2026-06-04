@@ -21,7 +21,7 @@ const CourseDetailPage = () => {
   useEffect(() => {
     const fetchCourse = async () => {
       try {
-        const response = await axios.get(`https://course-web-development.onrender.com/courses/${courseId}`);
+        const response = await axios.get(`/courses/${courseId}`);
         setCourse(response.data);
       } catch (err) {
         console.error("Error fetching course:", err);

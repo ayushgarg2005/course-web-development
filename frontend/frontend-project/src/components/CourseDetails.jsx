@@ -29,7 +29,7 @@ function CourseDetails() {
       }
 
       try {
-        const response = await axios.get(`https://course-web-development.onrender.com/courses/${courseId}`, {
+        const response = await axios.get(`/courses/${courseId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setCourse(response.data);
@@ -80,7 +80,7 @@ function CourseDetails() {
     try {
       const userId = localStorage.getItem("userId");
       const response = await axios.post(
-        "http://localhost:3000/courses/review",
+        "/courses/review",
         { id: courseId, userId, rating, comment },
         { headers: { Authorization: `Bearer ${token}` } }
       );

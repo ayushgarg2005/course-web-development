@@ -28,7 +28,7 @@ const PurchasedCourses = () => {
 
       try {
         setLoading(true); // Start loading
-        const response = await axios.get("https://course-web-development.onrender.com/purchased-courses", {
+        const response = await axios.get("/purchased-courses", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setCourses(response.data.purchasedCourses);

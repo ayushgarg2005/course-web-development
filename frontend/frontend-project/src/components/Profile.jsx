@@ -24,7 +24,7 @@ const Profile = () => {
     // Fetch user profile data using axios
     const fetchUserProfile = async () => {
       try {
-        const response = await axios.get(`https://course-web-development.onrender.com/profile/${userId}`);
+        const response = await axios.get(`/profile/${userId}`);
         setUserData(response.data); // Set fetched data in the state
         setLoading(false);
       } catch (err) {

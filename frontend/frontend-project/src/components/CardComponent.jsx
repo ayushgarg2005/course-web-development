@@ -40,7 +40,7 @@ const CardComponent = ({ course, isAuthenticated }) => {
     setIsLoading(true);
     try {
       const response = await axios.post(
-        'https://course-web-development.onrender.com/purchase',
+        "/purchase",
         { courseId: selectedCourse.id },
         {
           headers: {
@@ -87,7 +87,7 @@ const CardComponent = ({ course, isAuthenticated }) => {
     setIsLoading(true);
     try {
       // Use the configured axios instance which has baseURL and interceptors
-      await axios.delete(`https://course-web-development.onrender.com/courses/${course.id}`);
+      await axios.delete(`/courses/${course.id}`);
       toast.success("Course deleted successfully");
       window.location.reload(); // Refresh to show updated list
     } catch (error) {

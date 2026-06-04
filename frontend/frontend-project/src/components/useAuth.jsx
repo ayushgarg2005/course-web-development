@@ -1,7 +1,7 @@
 import { createContext, useContext, useState } from 'react';
 import axios from 'axios';
 
-axios.defaults.baseURL = 'https://course-web-development.onrender.com';
+axios.defaults.baseURL = 'https://course-web-development.vercel.app';
 
 const AuthContext = createContext();
 
