@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import z from 'zod';
 import User from '../models/User.js';
 import authenticate from '../middleware/authenticate.js';
-import { signupSchema, signinSchema } from '../schemas/zodSchemas.js';
+import { signupSchema, signinSchema } from '../schemas/zodschemas.js';
 import { JWT_SECRET_KEY, JWT_REFRESH_SECRET } from '../config/config.js';
 import { authLimiter } from '../middleware/ratelimiter.js';
 

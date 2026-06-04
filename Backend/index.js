@@ -9,7 +9,12 @@ import chatRoutes from './routes/chat.routes.js';
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: "https://course-web-development.vercel.app",
+    credentials: true,
+  })
+);
 
 // Strip $ and . from request body/params/query to block NoSQL injection
 // e.g. { "email": { "$gt": "" } } gets sanitized before hitting MongoDB
