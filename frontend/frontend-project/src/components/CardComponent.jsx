@@ -134,7 +134,7 @@ const CardComponent = ({ course, isAuthenticated }) => {
         <div
           className="w-full h-40 bg-gray-300 rounded-lg mb-3"
           style={{
-            backgroundImage: `url(/${(course.images && course.images[0]) || "default-image.jpg"})`,
+            backgroundImage: `url(${course.images?.[0] || "/default-image.jpg"})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
