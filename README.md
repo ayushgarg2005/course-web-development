@@ -71,3 +71,6 @@ A full-stack MERN platform where users can browse, purchase, and watch courses. 
 
 **Ayush Garg**
 GitHub: [@ayushgarg2005](https://github.com/ayushgarg2005)
+
+📄 License
+This project is open source and available under the MIT License.
