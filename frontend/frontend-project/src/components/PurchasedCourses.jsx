@@ -132,7 +132,7 @@ const PurchasedCourses = () => {
                     </div>
                     {/* Start Now Button */}
                     <button
-                      onClick={() => navigate(`/courses/${course.id}/videos`)}
+                      onClick={() => navigate(`/courses/${encodeURIComponent(course._id || course.id)}/videos`)}
                       className="mt-auto bg-green-500 text-white font-bold py-2 px-4 rounded hover:bg-green-600"
                     >
                       Start Now

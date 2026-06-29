@@ -7,10 +7,31 @@ import validateCourse from '../middleware/validateCourse.js';
 
 const router = express.Router();
 
+const getCourseQuery = (idParam) => {
+  if (!idParam) return { _id: null };
+  const cleanId = idParam.toString().trim();
+  const escapedId = cleanId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const isObjectId = /^[0-9a-fA-F]{24}$/.test(cleanId);
+
+  const orConditions = [
+    { id: cleanId },
+    { id: { $regex: new RegExp(`^\\s*${escapedId}\\s*$`, 'i') } }
+  ];
+
+  if (isObjectId) {
+    orConditions.push({ _id: cleanId });
+  }
+
+  return { $or: orConditions };
+};
+
 // ── Course Base Routes ──────────────────────────────────────────
 
 router.post('/courses', authenticate, authorize('admin'), validateCourse, async (req, res) => {
   try {
+    if (req.body && req.body.id) {
+      req.body.id = req.body.id.toString().trim();
+    }
     const newCourse = new Course({ ...req.body, createdBy: req.userId });
     await newCourse.save();
     res.status(201).json(newCourse);
@@ -32,7 +53,7 @@ router.get('/courses', async (req, res) => {
 // GET /courses/:id — get single course
 router.get('/courses/:id', async (req, res) => {
   try {
-    const query = { $or: [{ id: req.params.id }, { _id: req.params.id.match(/^[0-9a-fA-F]{24}$/) ? req.params.id : null }] };
+    const query = getCourseQuery(req.params.id);
     const course = await Course.findOne(query);
     if (!course) return res.status(404).json({ message: 'Course not found' });
     res.status(200).json(course);
@@ -44,7 +65,10 @@ router.get('/courses/:id', async (req, res) => {
 // PUT /courses/:id — update a course (Admin only, Creator only)
 router.put('/courses/:id', authenticate, authorize('admin'), async (req, res) => {
   try {
-    const query = { $or: [{ id: req.params.id }, { _id: req.params.id.match(/^[0-9a-fA-F]{24}$/) ? req.params.id : null }] };
+    if (req.body && req.body.id) {
+      req.body.id = req.body.id.toString().trim();
+    }
+    const query = getCourseQuery(req.params.id);
     let course = await Course.findOne(query);
     if (!course) return res.status(404).json({ message: 'Course not found' });
 
@@ -70,8 +94,7 @@ router.put('/courses/:id', authenticate, authorize('admin'), async (req, res) =>
 // DELETE /courses/:id — delete a course (Admin only, Creator only)
 router.delete('/courses/:id', authenticate, authorize('admin'), async (req, res) => {
   try {
-    // Check both custom ID and MongoDB ObjectId for maximum reliability
-    const query = { $or: [{ id: req.params.id }, { _id: req.params.id.match(/^[0-9a-fA-F]{24}$/) ? req.params.id : null }] };
+    const query = getCourseQuery(req.params.id);
     const course = await Course.findOne(query);
 
     if (!course) {
@@ -104,7 +127,7 @@ router.post('/courses/review', authenticate, async (req, res) => {
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    const course = await Course.findOne({ id: id.toString() });
+    const course = await Course.findOne(getCourseQuery(id));
     if (!course) return res.status(404).json({ message: 'Course not found' });
 
     const existingIndex = course.ratings.findIndex(
@@ -128,7 +151,7 @@ router.post('/courses/review', authenticate, async (req, res) => {
 // GET /courses/:courseId/feedback
 router.get('/courses/:courseId/feedback', async (req, res) => {
   try {
-    const course = await Course.findOne({ id: req.params.courseId })
+    const course = await Course.findOne(getCourseQuery(req.params.courseId))
       .populate('ratings.userId', 'name');
     if (!course) return res.status(404).json({ message: 'Course not found' });
 
@@ -149,7 +172,7 @@ router.get('/courses/:courseId/feedback', async (req, res) => {
 // POST /courses/:id/video
 router.post('/courses/:id/video', authenticate, authorize('admin'), async (req, res) => {
   try {
-    const course = await Course.findOne({ id: req.params.id });
+    const course = await Course.findOne(getCourseQuery(req.params.id));
     if (!course) return res.status(404).json({ message: 'Course not found' });
 
     course.videos.push(req.body);
@@ -163,7 +186,7 @@ router.post('/courses/:id/video', authenticate, authorize('admin'), async (req, 
 // GET /courses/:id/videos
 router.get('/courses/:id/videos', async (req, res) => {
   try {
-    const course = await Course.findOne({ id: req.params.id });
+    const course = await Course.findOne(getCourseQuery(req.params.id));
     if (!course) return res.status(404).json({ message: 'Course not found' });
     res.json({ videos: course.videos });
   } catch (error) {
@@ -174,7 +197,7 @@ router.get('/courses/:id/videos', async (req, res) => {
 // GET /courses/:id/video/:videoIndex
 router.get('/courses/:id/video/:videoIndex', async (req, res) => {
   try {
-    const course = await Course.findOne({ id: req.params.id });
+    const course = await Course.findOne(getCourseQuery(req.params.id));
     if (!course) return res.status(404).json({ message: 'Course not found' });
 
     const video = course.videos.find((v) => v.videoIndex == req.params.videoIndex);
@@ -189,7 +212,7 @@ router.get('/courses/:id/video/:videoIndex', async (req, res) => {
 // PUT /courses/:id/video/:videoIndex
 router.put('/courses/:id/video/:videoIndex', authenticate, authorize('admin'), async (req, res) => {
   try {
-    const course = await Course.findOne({ id: req.params.id });
+    const course = await Course.findOne(getCourseQuery(req.params.id));
     if (!course) return res.status(404).json({ message: 'Course not found' });
 
     const video = course.videos.find((v) => v.videoIndex == req.params.videoIndex);
@@ -206,7 +229,7 @@ router.put('/courses/:id/video/:videoIndex', authenticate, authorize('admin'), a
 // DELETE /courses/:id/video/:videoIndex
 router.delete('/courses/:id/video/:videoIndex', authenticate, authorize('admin'), async (req, res) => {
   try {
-    const course = await Course.findOne({ id: req.params.id });
+    const course = await Course.findOne(getCourseQuery(req.params.id));
     if (!course) return res.status(404).json({ message: 'Course not found' });
 
     course.videos = course.videos.filter((v) => v.videoIndex != req.params.videoIndex);

@@ -41,7 +41,7 @@ const Profile = () => {
   if (error) return <div className="text-center text-lg text-red-600">{error}</div>;
 
   const goToCourseDetail = (courseId) => {
-    navigate(`/courses/${courseId}`);
+    navigate(`/course-detail/${encodeURIComponent(courseId)}`);
   };
 
   return (
@@ -64,8 +64,8 @@ const Profile = () => {
               <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
                 {userData.purchasedCourses.map(course => (
                 <li
-                  key={course.id}
-                  onClick={() => goToCourseDetail(course.id)} // Redirect to course detail page
+                  key={course._id || course.id}
+                  onClick={() => goToCourseDetail(course._id || course.id)} // Redirect to course detail page
                   className="bg-white p-10 rounded-lg shadow-lg border border-gray-300 hover:border-blue-500 hover:cursor-pointer transition-all duration-300 ease-in-out"
                 >
                   <div>

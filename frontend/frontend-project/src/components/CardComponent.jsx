@@ -18,8 +18,9 @@ const CardComponent = ({ course, isAuthenticated }) => {
   const userId = localStorage.getItem("userId");
 
   const handleCardClick = () => {
-    if (location.pathname === `/course-detail/${course.id}`) return;
-    navigate(`/course-detail/${course.id}`);
+    const targetId = encodeURIComponent(course._id || course.id);
+    if (location.pathname === `/course-detail/${course.id}` || location.pathname === `/course-detail/${targetId}`) return;
+    navigate(`/course-detail/${targetId}`);
   };
 
   const handleBuyNowClick = (e) => {
@@ -87,7 +88,7 @@ const CardComponent = ({ course, isAuthenticated }) => {
     setIsLoading(true);
     try {
       // Use the configured axios instance which has baseURL and interceptors
-      await axios.delete(`/courses/${course.id}`);
+      await axios.delete(`/courses/${encodeURIComponent(course._id || course.id)}`);
       toast.success("Course deleted successfully");
       window.location.reload(); // Refresh to show updated list
     } catch (error) {
@@ -101,7 +102,7 @@ const CardComponent = ({ course, isAuthenticated }) => {
 
   const handleEditClick = (e) => {
     e.stopPropagation();
-    navigate(`/edit-course/${course.id}`);
+    navigate(`/edit-course/${encodeURIComponent(course._id || course.id)}`);
   };
 
   return (

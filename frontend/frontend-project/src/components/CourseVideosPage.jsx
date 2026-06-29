@@ -15,7 +15,7 @@ const CourseVideosPage = () => {
   useEffect(() => {
     const fetchVideos = async () => {
       try {
-        const response = await axios.get(`/courses/${courseId}/videos`);
+        const response = await axios.get(`/courses/${encodeURIComponent(courseId)}/videos`);
         setVideos(response.data.videos);
       } catch (err) {
         setError("Failed to load course videos.");
@@ -41,7 +41,7 @@ const CourseVideosPage = () => {
               <div
                 key={video._id}
                 className="bg-white p-4 rounded-lg shadow-md border cursor-pointer"
-                onClick={() => navigate(`/courses/${courseId}/video/${video.videoIndex}`)}
+                onClick={() => navigate(`/courses/${encodeURIComponent(courseId)}/video/${video.videoIndex}`)}
               >
                 <img src={`/${video.thumbnail}`} alt="Thumbnail" className="w-full h-40 object-cover rounded-lg mb-3" />
                 <p className="text-gray-600"><strong>Topic:</strong> {video.title}</p>

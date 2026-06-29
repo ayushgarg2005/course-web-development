@@ -28,7 +28,7 @@ const AddCourse = () => {
     if (isEditMode) {
       const fetchCourseData = async () => {
         try {
-          const response = await axios.get(`/courses/${courseId}`);
+          const response = await axios.get(`/courses/${encodeURIComponent(courseId)}`);
           setCourseData(response.data);
         } catch (error) {
           toast.error("Failed to load course data for editing");
@@ -114,13 +114,14 @@ const AddCourse = () => {
 
       const finalData = {
         ...pureCourseData,
+        id: (pureCourseData.id || '').toString().trim(),
         learnPoints: (courseData.learnPoints || []).filter(p => p && p.trim() !== ""),
         images: (courseData.images || []).filter(img => img && img.trim() !== ""),
         videos: filteredVideos.length > 0 ? filteredVideos : undefined,
       };
       
       if (isEditMode) {
-        await axios.put(`/courses/${courseId}`, finalData);
+        await axios.put(`/courses/${encodeURIComponent(courseId)}`, finalData);
         toast.success('Course updated successfully!');
       } else {
         await axios.post('/courses', finalData);
